@@ -170,15 +170,23 @@ class Tozny_Remote_Realm_API
      * Does the given user exist in this realm?
      *
      * @param  int     $email The email of the user we're looking for
-     * @return boolean true if the user is known and there are no errors.
+     * @return boolean|int false if the user does not exist, or there was an .
      */
     function userEmailExists($email)
     {
         $cmdOut = $this->rawCall (['method' => 'realm.user_exists', 'email' => $email]);
-        if ($cmdOut['return'] === 'true') {
-            return true;
-        } else {
+        if ($cmdOut['return'] === 'true' && !empty($cmdOut['user_id'])) {
+            return $cmdOut['user_id'];
+        } else if ($cmdOut['return'] === 'false') {
             return false;
+        } else {
+            $msg = $cmdOut['errors'][0]['error_message'];
+            if (!empty($msg)) {
+                throw new Exception($msg);
+            } else {
+                throw new Exception(sprintf("Unexpected error: %s", print_r($cmdOut, true)));
+
+            }
         }
     }
 

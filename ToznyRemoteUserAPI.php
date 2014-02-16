@@ -78,6 +78,15 @@ class Tozny_Remote_User_API
                 break;
             }
         }
+		
+		# if we couldnt find it, see if it's packaged as a library for distribution
+        if (!$foundCommon) {
+            if (file_exists(__DIR__.'/tozny_common/OCRAWrapper.php')) {
+               set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ . '/tozny_common');
+			   $foundCommon = true;
+			}
+        }
+		
         # if we couldnt find it, add the /var/www/library/tozny_common directory exists and is readable, then add it to the include path.
         if (!$foundCommon) {
             if (!file_exists('/var/www/library/tozny_common/OCRAWrapper.php')) {

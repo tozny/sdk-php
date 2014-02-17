@@ -157,11 +157,14 @@ class Tozny_Remote_Realm_API
      */
     function userExists($user_id)
     {
-        $cmdOut = $this->rawCall (['method' => 'realm.user_exists',
-            'user_id' => $user_id]);
+        $cmdOut = $this->rawCall ([
+            'method' => 'realm.user_exists',
+            'user_id' => $user_id
+        ]);
         if ($cmdOut['return'] === 'true') {
             return true;
         } else {
+            // TODO: This is wrong! we are not distinguishing between a call that succeeds but doesn't find a user, from a call that fails.
             return false;
         }
     }
@@ -169,17 +172,28 @@ class Tozny_Remote_Realm_API
     /**
      * Does the given user exist in this realm?
      *
-     * @param  int     $email The email of the user we're looking for
+     * @param  string     $email The email of the user we're looking for
      * @return boolean|int false if the user does not exist, or there was an .
      */
     function userEmailExists($email)
     {
-        $cmdOut = $this->rawCall (['method' => 'realm.user_exists', 'email' => $email]);
+        $cmdOut = $this->rawCall ([
+            'method' => 'realm.user_exists',
+            'tozny_email' => $email
+        ]);
+
+        # Success & User found
         if ($cmdOut['return'] === 'true' && !empty($cmdOut['user_id'])) {
             return $cmdOut['user_id'];
-        } else if ($cmdOut['return'] === 'false') {
+        }
+
+        # Success & User not found
+        else if ($cmdOut['return'] === 'false') {
             return false;
-        } else {
+        }
+
+        # Failure
+        else {
             $msg = $cmdOut['errors'][0]['error_message'];
             if (!empty($msg)) {
                 throw new Exception($msg);

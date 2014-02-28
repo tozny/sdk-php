@@ -47,11 +47,11 @@ class Tozny_Remote_Account_API
     /**
      * Build this class based on the remote site's key ID.
      *
-     * @param string  $user_id
+     * @param string $user_id
      * @param unknown $account_priv
-     * @param unknown $in_api_url   (optional)
+     * @param unknown $in_api_url (optional)
      */
-    function __construct( $user_id, $account_priv,  $account_realm, $in_api_url = NULL)
+    function __construct($user_id, $account_priv, $account_realm, $in_api_url = NULL)
     {
         $this->setAccount($user_id, $account_priv, $account_realm);
 
@@ -73,11 +73,10 @@ class Tozny_Remote_Account_API
      */
     function setAccount($user_id, $account_priv_key, $account_realm)
     {
-        $this->_account['user_id']   = $user_id;
-        $this->_account['priv_key']  = $account_priv_key;
+        $this->_account['user_id'] = $user_id;
+        $this->_account['priv_key'] = $account_priv_key;
         $this->_account['realm_key'] = $account_realm;
     }
-
 
 
     /**
@@ -86,9 +85,9 @@ class Tozny_Remote_Account_API
      * @
      * @return unknown
      * */
-    function realmsGet() 
+    function realmsGet()
     {
-        $args = ['method' => 'account.realms_get'];
+        $args = array('method' => 'account.realms_get');
 
         $realms_arr = $this->rawCall($args);
 
@@ -98,11 +97,11 @@ class Tozny_Remote_Account_API
     // array('open_enrollment', 'name', 'info_url', 'login_url');
     function realmAdd($open_enrollment, $name, $info_url, $logo_url)
     {
-        $args = ['method' => 'account.realm_add',
+        $args = array('method' => 'account.realm_add',
             'open_enrollment' => $open_enrollment,
-            'name'            => $name,
-            'info_url'        => $info_url,
-            'logo_url'        => $logo_url];
+            'name' => $name,
+            'info_url' => $info_url,
+            'logo_url' => $logo_url);
 
         return $this->rawCall($args);
     }
@@ -112,11 +111,11 @@ class Tozny_Remote_Account_API
      * We have received a sign package and signature
      * lets verify it
      *
-     * @param string  $signed_data - who's logging in
-     * @param string  $signature   - the signature for the payload
+     * @param string $signed_data - who's logging in
+     * @param string $signature - the signature for the payload
      * @return unknown
      */
-    function verifyLogin( $signed_data, $signature )
+    function verifyLogin($signed_data, $signature)
     {
         $check['signed_data'] = $signed_data;
         $check['signature'] = $signature;
@@ -125,14 +124,13 @@ class Tozny_Remote_Account_API
     }
 
 
-
     /**
      * This decodes signed data
      *
-     * @param string  $signed_data
+     * @param string $signed_data
      * @return unknown
      */
-    function decodeSignedData( $signed_data )
+    function decodeSignedData($signed_data)
     {
         return json_decode($this->_base64UrlDecode($signed_data), true);
     }
@@ -143,7 +141,7 @@ class Tozny_Remote_Account_API
      * then decode the results. Includes generation of the nonce and
      * signing of the message
      *
-     * @param array   $args an associative array for the call
+     * @param array $args an associative array for the call
      * @return array either with the response or an error
      */
     function rawCall(array $args)
@@ -158,8 +156,8 @@ class Tozny_Remote_Account_API
             $args['user_id'] = $this->_account['user_id'];
         }
 
-        $sigArr = $this->_encodeAndSignArr (json_encode($args), $this->_account['priv_key']);
-        $call = $this->_api_url  . "?" . http_build_query($sigArr);
+        $sigArr = $this->_encodeAndSignArr(json_encode($args), $this->_account['priv_key']);
+        $call = $this->_api_url . "?" . http_build_query($sigArr);
         $encodedResult = file_get_contents($call);
         return json_decode($encodedResult, true);
     }
@@ -176,10 +174,10 @@ class Tozny_Remote_Account_API
     function checkSigGetData($data)
     {
         $data_payload = $data["signed_data"];
-        $sig_payload  = $data["signature"];
+        $sig_payload = $data["signature"];
 
         $sig = self::base64UrlDecode($sig_payload);
-        if ($this->checkSig ($sig, $data_payload)) {
+        if ($this->checkSig($sig, $data_payload)) {
             return json_decode(self::base64UrlDecode($data_payload), true);
         } else {
             return false;
@@ -220,13 +218,10 @@ class Tozny_Remote_Account_API
     }
 
 
-
-
-
     /**
      * This encodes data
      *
-     * @param string  $data
+     * @param string $data
      * @return unknown
      */
     function _base64UrlEncode($data)
@@ -235,31 +230,25 @@ class Tozny_Remote_Account_API
     }
 
 
-
-
-
     /**
      * This decodes data
      *
-     * @param string  $data
+     * @param string $data
      * @return unknown
      */
     function _base64UrlDecode($data)
     {
         return (base64_decode(str_pad(strtr($data, '-_', '+/'),
-                    strlen($data) % 4, '=   ', STR_PAD_RIGHT)));
+            strlen($data) % 4, '=   ', STR_PAD_RIGHT)));
     }
-
-
-
 
 
     /**
      * This checks a signature
      *
-     * @param string  $dangerous_signature - signature of request
-     * @param string  $dangerous_request   - request
-     * @param string  $secret              - secret key
+     * @param string $dangerous_signature - signature of request
+     * @param string $dangerous_request - request
+     * @param string $secret - secret key
      * @return unknown
      */
     function _checkSig($dangerous_signature, $dangerous_request, $secret)
@@ -276,32 +265,29 @@ class Tozny_Remote_Account_API
     }
 
 
-
     /**
      * Internal function to bas64 encode this json object and sign it
      *
      * @param unknown $json_data the json object to encode and sign
-     * @param unknown $secret    the signing secret
+     * @param unknown $secret the signing secret
      * @return A readied payload with signed_data and signature
      */
     function _encodeAndSignArr($json_data, $secret)
     {
         $encoded_data = self::base64UrlEncode($json_data);
-        $sig          = hash_hmac('sha256', $encoded_data, $secret, $raw = true);
-        $encoded_sig  = self::base64UrlEncode($sig);
+        $sig = hash_hmac('sha256', $encoded_data, $secret, $raw = true);
+        $encoded_sig = self::base64UrlEncode($sig);
 
-        return (["signed_data" => $encoded_data
-            , "signature"   => $encoded_sig]);
+        return (array("signed_data" => $encoded_data
+        , "signature" => $encoded_sig));
     }
-
-
 
 
     /**
      * encode according to rfc4648 for url-safe base64 encoding
      *
      *
-     * @param string  $data The data to encode
+     * @param string $data The data to encode
      * @return The encoded data
      */
     static function base64UrlEncode($data)
@@ -310,21 +296,22 @@ class Tozny_Remote_Account_API
     }
 
 
-
     /**
      * decode according to rfc4648 for url-safe base64 encoding
      *
      *
-     * @param string  $data The data to decode
+     * @param string $data The data to decode
      * @return The decoded data
      */
     static function base64UrlDecode($data)
     {
         return (base64_decode(str_pad(strtr($data, '-_', '+/'),
-                    strlen($data) % 4, '=   ', STR_PAD_RIGHT)));
+            strlen($data) % 4, '=   ', STR_PAD_RIGHT)));
     }
 
 
-}// Tozny_Remote_Account_API class
+}
+
+// Tozny_Remote_Account_API class
 
 ?>

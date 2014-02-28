@@ -47,11 +47,11 @@ class Tozny_Remote_Realm_API
     /**
      * Build this class based on the remote site's key ID.
      *
-     * @param string  $realm_key_id
+     * @param string $realm_key_id
      * @param unknown $realm_secret
-     * @param unknown $in_api_url   (optional)
+     * @param unknown $in_api_url (optional)
      */
-    function __construct( $realm_key_id, $realm_secret, $in_api_url = NULL)
+    function __construct($realm_key_id, $realm_secret, $in_api_url = NULL)
     {
         $this->setRealm($realm_key_id, $realm_secret);
 
@@ -68,46 +68,34 @@ class Tozny_Remote_Realm_API
     }
 
 
-
-
-
-
-
-
     /**
      *
      *
      * @param unknown $realm_key_id
      * @param unknown $realm_secret
      */
-    function setRealm( $realm_key_id, $realm_secret )
+    function setRealm($realm_key_id, $realm_secret)
     {
         $this->_realm['realm_key_id'] = $realm_key_id;
         $this->_realm['realm_priv_key'] = $realm_secret;
     }
 
 
-
-
-
     /**
      * We have received a sign package and signature
      * lets verify it
      *
-     * @param string  $signed_data - who's logging in
-     * @param string  $signature   - the signature for the payload
+     * @param string $signed_data - who's logging in
+     * @param string $signature - the signature for the payload
      * @return unknown
      */
-    function verifyLogin( $signed_data, $signature )
+    function verifyLogin($signed_data, $signature)
     {
         $check['signed_data'] = $signed_data;
         $check['signature'] = $signature;
         return self::checkSigGetData($check);
 
     }
-
-
-
 
 
     /**
@@ -120,11 +108,14 @@ class Tozny_Remote_Realm_API
      */
     function _checkValidLogin($user_id, $session_id, $expires_at)
     {
-        $cmdOut = $this->rawCall (['method'     => 'realm.check_valid_login',
-            'user_id'    => $user_id,
-            'session_id' => $session_id,
-            'expires_at' => $expires_at
-            ]);
+        $cmdOut = $this->rawCall(
+            array(
+                'method' => 'realm.check_valid_login',
+                'user_id' => $user_id,
+                'session_id' => $session_id,
+                'expires_at' => $expires_at
+            )
+        );
         if ($cmdOut['return'] === 'true') {
             return true;
         } else {
@@ -133,18 +124,18 @@ class Tozny_Remote_Realm_API
     }
 
 
-    function questionChallenge($question, $user_id=NULL)
+    function questionChallenge($question, $user_id = NULL)
     {
         $args = array(
-            'method'    => 'realm.question_challenge'
-        ,   'question'  => $question
+            'method' => 'realm.question_challenge',
+            'question' => $question
         );
 
         if (!empty($user_id)) {
             $args['user_id'] = $user_id;
         }
 
-        $questionChallenge = $this->rawCall ($args);
+        $questionChallenge = $this->rawCall($args);
         return $questionChallenge;
     }
 
@@ -152,15 +143,17 @@ class Tozny_Remote_Realm_API
     /**
      * Does the given user exist in this realm?
      *
-     * @param int     $user_id The user ID of the user we're looking for
+     * @param int $user_id The user ID of the user we're looking for
      * @return boolean true if the user is known and there are no errors.
      */
     function userExists($user_id)
     {
-        $cmdOut = $this->rawCall ([
-            'method' => 'realm.user_exists',
-            'user_id' => $user_id
-        ]);
+        $cmdOut = $this->rawCall(
+            array(
+                'method' => 'realm.user_exists',
+                'user_id' => $user_id
+            )
+        );
         if ($cmdOut['return'] === 'true') {
             return true;
         } else {
@@ -172,27 +165,25 @@ class Tozny_Remote_Realm_API
     /**
      * Does the given user exist in this realm?
      *
-     * @param  string     $email The email of the user we're looking for
+     * @param  string $email The email of the user we're looking for
      * @return boolean|int false if the user does not exist, or there was an .
      */
     function userEmailExists($email)
     {
-        $cmdOut = $this->rawCall ([
-            'method' => 'realm.user_exists',
-            'tozny_email' => $email
-        ]);
+        $cmdOut = $this->rawCall(
+            array(
+                'method' => 'realm.user_exists',
+                'tozny_email' => $email
+            )
+        );
 
         # Success & User found
         if ($cmdOut['return'] === 'true' && !empty($cmdOut['user_id'])) {
             return $cmdOut['user_id'];
-        }
-
-        # Success & User not found
+        } # Success & User not found
         else if ($cmdOut['return'] === 'false') {
             return false;
-        }
-
-        # Failure
+        } # Failure
         else {
             $msg = $cmdOut['errors'][0]['error_message'];
             if (!empty($msg)) {
@@ -207,15 +198,17 @@ class Tozny_Remote_Realm_API
     /**
      * Add this user to the given realm.
      *
-     * @param string  $defer    (optional) Whether to use deferred enrollment. Defaults false.
+     * @param string $defer (optional) Whether to use deferred enrollment. Defaults false.
      * @param unknown $metadata (optional)
      * @return The Tozny_API_User object if successful, otherwise false.
      */
     function userAdd($defer = 'false', $metadata = NULL)
     {
-        $args = ['method' => 'realm.user_add',
-        'defer'  => $defer];
-        if (! empty ($metadata)) {
+        $args = array(
+            'method' => 'realm.user_add',
+            'defer' => $defer
+        );
+        if (!empty ($metadata)) {
 
             $extras = self::base64UrlEncode(json_encode($metadata));
 
@@ -253,9 +246,11 @@ class Tozny_Remote_Realm_API
 
         $extra_fields = $this->_base64UrlEncode(json_encode($extra_fields));
 
-        $args = ['method' => 'realm.user_update',
-        'user_id' => $user_id,
-        'extra_fields' => $extra_fields];
+        $args = array(
+            'method' => 'realm.user_update',
+            'user_id' => $user_id,
+            'extra_fields' => $extra_fields
+        );
 
         $user_arr = $this->rawCall($args);
 
@@ -265,13 +260,15 @@ class Tozny_Remote_Realm_API
     /**
      * Get a user from the given realm
      *
-     * @param string  $user_id User id to fetch
+     * @param string $user_id User id to fetch
      * @return array user_id, metadata
      */
     function userGet($user_id)
     {
-        $args = ['method' => 'realm.user_get',
-        'user_id' => $user_id ];
+        $args = array(
+            'method' => 'realm.user_get',
+            'user_id' => $user_id
+        );
 
         $user_arr = $this->rawCall($args);
         //TODO: Handle errors
@@ -280,58 +277,57 @@ class Tozny_Remote_Realm_API
     }
 
 
-
-
-
     /**
      *
      *
-     * @param unknown $term           (optional)
-     * @param unknown $meta_advanced  (optional)
+     * @param unknown $term (optional)
+     * @param unknown $meta_advanced (optional)
      * @param unknown $tozny_advanced (optional)
-     * @param unknown $meta_fields    (optional)
-     * @param unknown $tozny_fields   (optional)
-     * @param unknown $userid         (optional)
-     * @param unknown $rows           (optional)
-     * @param unknown $offset         (optional)
-     * @param unknown $page           (optional)
+     * @param unknown $meta_fields (optional)
+     * @param unknown $tozny_fields (optional)
+     * @param unknown $userid (optional)
+     * @param unknown $rows (optional)
+     * @param unknown $offset (optional)
+     * @param unknown $page (optional)
      * @return unknown
      */
     function usersGet($term = NULL,
-        $meta_advanced = NULL,
-        $tozny_advanced = NULL,
-        $meta_fields = NULL,
-        $tozny_fields = NULL,
-        $userid = NULL,
-        $rows = NULL,
-        $offset = NULL,
-        $page = NULL)
+                      $meta_advanced = NULL,
+                      $tozny_advanced = NULL,
+                      $meta_fields = NULL,
+                      $tozny_fields = NULL,
+                      $userid = NULL,
+                      $rows = NULL,
+                      $offset = NULL,
+                      $page = NULL)
     {
-		
-		if(!empty($meta_advanced)){
-			$meta_advanced = self::base64UrlEncode(json_encode($meta_advanced));
-		}
-		
-		if(!empty($tozny_advanced)){
-			$tozny_advanced = self::base64UrlEncode(json_encode($tozny_advanced));
-		}
-		
-		if (!empty($userid)) {
+
+        if (!empty($meta_advanced)) {
+            $meta_advanced = self::base64UrlEncode(json_encode($meta_advanced));
+        }
+
+        if (!empty($tozny_advanced)) {
+            $tozny_advanced = self::base64UrlEncode(json_encode($tozny_advanced));
+        }
+
+        if (!empty($userid)) {
             if (is_array($userid)) {
                 $userid = implode(",", $userid);
-            } 
+            }
         }
-		
-        $args = ['method' => 'realm.users_get',
-        'term' => $term,
-        'meta_advanced' => $meta_advanced,
-        'tozny_advanced' => $tozny_advanced,
-        'meta_fields' => $meta_fields,
-        'tozny_fields' => $tozny_fields,
-		'user_ids' => $userid,
-        'rows' => $rows,
-        'offset' => $offset,
-        'page' => $page ];
+
+        $args = array(
+            'method' => 'realm.users_get',
+            'term' => $term,
+            'meta_advanced' => $meta_advanced,
+            'tozny_advanced' => $tozny_advanced,
+            'meta_fields' => $meta_fields,
+            'tozny_fields' => $tozny_fields,
+            'user_ids' => $userid,
+            'rows' => $rows,
+            'offset' => $offset,
+            'page' => $page
+        );
 
         $user_arr = $this->rawCall($args);
 
@@ -342,128 +338,144 @@ class Tozny_Remote_Realm_API
     /**
      * Get the user id for the given user_key_id
      *
-     * @param string  $user_key_id
+     * @param string $user_key_id
      * @return the user_id
      */
     function userGetId($user_key_id)
     {
-        return $this->rawCall (['method' => 'realm.user_get_id',
-            'user_key_id'  => $user_key_id]);
+        return $this->rawCall(
+            array(
+                'method' => 'realm.user_get_id',
+                'user_key_id' => $user_key_id
+            )
+        );
     }
 
 
     /**
      * Delete the given user
      *
-     * @param string  $user_id
+     * @param string $user_id
      * @return Success or error json objects.
      */
     function userDelete($user_id)
     {
-        return $this->rawCall(['method'  => 'realm.user_delete'
-            , 'user_id' => $user_id]);
+        return $this->rawCall(
+            array(
+                'method' => 'realm.user_delete',
+                'user_id' => $user_id
+            )
+        );
     }
-	
-	
-	// -----------------------------------
-	// -- Fields
-	// -----------------------------------
-	
-	
-	/**
+
+
+    // -----------------------------------
+    // -- Fields
+    // -----------------------------------
+
+
+    /**
      * fieldsGet
      *
-     * @param field_id  
+     * @param field_id
      * @return array of Field data
      */
     function fieldsGet($field_ids = NULL, $page = 1, $rows = 20, $offset = 0, $term = NULL)
     {
-		$call = array('method' => 'realm.fields_get'
-                    , 'field_id' => $field_ids
-					, 'page'     => $page
-					, 'rows'     => $rows
-					, 'offset'   => $offset
-					, 'term'     => $term);
-		
+        $call = array(
+            'method' => 'realm.fields_get',
+            'field_id' => $field_ids,
+            'page' => $page,
+            'rows' => $rows,
+            'offset' => $offset,
+            'term' => $term
+        );
+
         return $this->rawCall($call);
-		
+
     }
-	
-	
-	/**
+
+
+    /**
      * fieldGet
      *
-     * @param field_id  
+     * @param field_id
      * @return array of Field data
      */
     function fieldGet($field_id)
     {
-		$call = array('method' => 'realm.field_get'
-                    , 'field_id' => $field_id);
-		
+        $call = array(
+            'method' => 'realm.field_get',
+            'field_id' => $field_id
+        );
+
         return $this->rawCall($call);
     }
-	
-	
-	/**
+
+
+    /**
      * fieldAdd
      *
-     * @param string  $name
-     * @param string  $field
-     * @param array  $options array( 
-	 *                required, 
-	 *				  encrypted,
-	 *				  searchable,
-	 *                maps_to, 
-	 *                uniq, 
-	 *				  primary_view, 
-	 *                secondary_view)
+     * @param string $name
+     * @param string $field
+     * @param array $options array(
+     *                required,
+     *                  encrypted,
+     *                  searchable,
+     *                maps_to,
+     *                uniq,
+     *                  primary_view,
+     *                secondary_view)
      * @return Field data
      */
     function fieldAdd($name, $field, $options = NULL)
     {
-		$call = array('method' => 'realm.field_add'
-                    , 'name' => $name
-                    , 'field'  => $field);
-		
-		if(is_array($options)){
-		    $call = array_merge($call, $options);
-		}
-		
+        $call = array(
+            'method' => 'realm.field_add',
+            'name' => $name,
+            'field' => $field
+        );
+
+        if (is_array($options)) {
+            $call = array_merge($call, $options);
+        }
+
         return $this->rawCall($call);
     }
-	
-	
-	/**
+
+
+    /**
      * fieldUpdate
      *
      * @param string $field_id
-     * @param array  $options array(
-	 *                name, 
-	 *                required, 
-	 *				  encrypted,
-	 *				  searchable,
-	 *                maps_to, 
-	 *                uniq, 
-	 *				  primary_view, 
-	 *                secondary_view)
-     * @return Field data 
+     * @param array $options array(
+     *                name,
+     *                required,
+     *                  encrypted,
+     *                  searchable,
+     *                maps_to,
+     *                uniq,
+     *                  primary_view,
+     *                secondary_view)
+     * @return Field data
      */
     function fieldUpdate($field_id, $options = NULL)
     {
-		$call = array('method' => 'realm.field_update'
-                    , 'field_id' => $field_id);
-		
-		if(is_array($options)){
-		    $call = array_merge($call, $options);
-		}
-		
+        $call = array(
+            'method' => 'realm.field_update',
+            'field_id' => $field_id
+        );
+
+        if (is_array($options)) {
+            $call = array_merge($call, $options);
+        }
+
         return $this->rawCall($call);
-		
-    } 
-	
-	
-	/**
+
+    }
+
+
+    /**
      * fieldDelete
      *
      * @param string $field_id
@@ -471,20 +483,21 @@ class Tozny_Remote_Realm_API
      */
     function fieldDelete($field_id)
     {
-		$call = array('method' => 'realm.field_delete'
-                    , 'field_id' => $field_id);
-		
+        $call = array(
+            'method' => 'realm.field_delete',
+            'field_id' => $field_id
+        );
+
         return $this->rawCall($call);
-		
-    } 
+
+    }
 
 
     // -----------------------------------
-	// -- Postbacks
-	// -----------------------------------
-	
-	
-	
+    // -- Postbacks
+    // -----------------------------------
+
+
     /**
      *
      *
@@ -493,20 +506,24 @@ class Tozny_Remote_Realm_API
      */
     function postbackGet($postback_id)
     {
-        $args = ['method' => 'realm.postback_get',
-        'postback_id' => $postback_id];
+        $args = array(
+            'method' => 'realm.postback_get',
+            'postback_id' => $postback_id
+        );
 
         return $this->rawCall($args);
     }
 
     function postbacksGet($postback_ids = NULL, $page = 1, $rows = 20, $offset = 0, $term = NULL)
     {
-        $args = ['method' => 'realm.postbacks_get'
-		        ,'page'   => $page
-				,'rows'   => $rows
-				,'offset' => $offset
-				,'term'   => $term];
- 
+        $args = array(
+            'method' => 'realm.postbacks_get',
+            'page' => $page,
+            'rows' => $rows,
+            'offset' => $offset,
+            'term' => $term
+        );
+
         if (!empty($postback_ids)) {
             if (is_array($postback_ids)) {
                 $args['postback_ids'] = implode(",", $postback_ids);
@@ -519,29 +536,31 @@ class Tozny_Remote_Realm_API
     }
 
 
-      /**
+    /**
      * Add this postback
      *
-     * @param string  $postback_hook
-     * @param string  $postback_url
-     * @param string  $postback_type
+     * @param string $postback_hook
+     * @param string $postback_url
+     * @param string $postback_type
      * @return Postback data like the postback_id
      */
-    function postbackAdd($name, $postback_url, $postback_type, $postback_hook, 
-	                     $postback_triggers = NULL)
+    function postbackAdd($name, $postback_url, $postback_type, $postback_hook,
+                         $postback_triggers = NULL)
     {
-        return $this->rawCall(['method' => 'realm.postback_add'
-            , 'postback_hook' => $postback_hook
-            , 'postback_url'  => $postback_url
-            , 'postback_type' => $postback_type
-			, 'name'          => $name
-			, 'postback_triggers' => $postback_triggers]);
+        return $this->rawCall(
+            array(
+                'method' => 'realm.postback_add',
+                'postback_hook' => $postback_hook,
+                'postback_url' => $postback_url,
+                'postback_type' => $postback_type,
+                'name' => $name,
+                'postback_triggers' => $postback_triggers
+            )
+        );
     }
-	
-	
-	
-	
-	/**
+
+
+    /**
      *
      *
      * @param unknown $postback_id
@@ -549,7 +568,7 @@ class Tozny_Remote_Realm_API
      */
     function postbackUpdate($postback_id, $args)
     {
-        $args['method']      = 'realm.postback_update';
+        $args['method'] = 'realm.postback_update';
         $args['postback_id'] = $postback_id;
 
         return $this->rawCall($args);
@@ -559,13 +578,17 @@ class Tozny_Remote_Realm_API
     /**
      * Delete the given postback
      *
-     * @param string  $postback_id
+     * @param string $postback_id
      * @return Postback data like the postback_id
      */
     function postbackDelete($postback_id)
     {
-        return $this->rawCall (['method'      => 'realm.postback_delete'
-            , 'postback_id' => $postback_id]);
+        return $this->rawCall(
+            array(
+                'method' => 'realm.postback_delete',
+                'postback_id' => $postback_id
+            )
+        );
     }
 
 
@@ -577,8 +600,10 @@ class Tozny_Remote_Realm_API
      */
     function postbackExists($postback_id)
     {
-        $args = ['method' => 'realm.postback_exists',
-        'postback_id' => $postback_id];
+        $args = array(
+            'method' => 'realm.postback_exists',
+            'postback_id' => $postback_id
+        );
 
         return $this->rawCall($args);
     }
@@ -586,82 +611,84 @@ class Tozny_Remote_Realm_API
 
     // --------------------------
     // Postback Results calls
-	// --------------------------
-	
-	
-	
-	/**
+    // --------------------------
+
+
+    /**
      *
      *
      * @param unknown $postback_id - comma separated list of postback id's
      * @return unknown
      */
-	function postbacksResults($postback_ids = NULL)
-	{
-	    $args = ['method' => 'realm.postbacks_results',
-		'postback_ids' => $postback_ids];
+    function postbacksResults($postback_ids = NULL)
+    {
+        $args = array(
+            'method' => 'realm.postbacks_results',
+            'postback_ids' => $postback_ids
+        );
 
         $results = $this->rawCall($args);
-		foreach($results['results'] as $ret){
-			$out[$ret['id']] = $ret;
-			$out[$ret['id']]['payload'] = json_decode($ret['payload']);
-			// TODO - change this to encryption instead of unsigning
-			$out[$ret['id']]['results'] = $this->siteApi->postbackReceive($results['payload']);
-		}
-		return $out;
-			
-	}
-	
-	
-	// --------------------------
+        foreach ($results['results'] as $ret) {
+            $out[$ret['id']] = $ret;
+            $out[$ret['id']]['payload'] = json_decode($ret['payload']);
+            // TODO - change this to encryption instead of unsigning
+            $out[$ret['id']]['results'] = $this->siteApi->postbackReceive($results['payload']);
+        }
+        return $out;
+
+    }
+
+
+    // --------------------------
     // Postback Receive
-	// --------------------------
-	
-	
-	
-	/**
+    // --------------------------
+
+
+    /**
      *
      *
      * @param unknown $postback_id - comma separated list of postback id's
      * @return unknown
      */
-	function postbackReceive($signed_data, $signature)
-	{
-	    $data['signed_data'] = $signed_data;
-		$data['signature']   = $signature;
-		
-		$ret = $this->checkSigGetData($data);
-		
-		if(!$ret){
-		   $out['return']      = "error";
-		   $out['errors'][0]['status_code']    = "400";	
-		   $out['errors'][0]['error_message']  = "Invalid payload";
-		   $out['errors'][0]['location']       = "postbackReceive";	
-		}else{
-		   $out	= $ret;
-		}
-		
-		return $out;
-			
-	}
+    function postbackReceive($signed_data, $signature)
+    {
+        $data['signed_data'] = $signed_data;
+        $data['signature'] = $signature;
+
+        $ret = $this->checkSigGetData($data);
+
+        if (!$ret) {
+            $out['return'] = "error";
+            $out['errors'][0]['status_code'] = "400";
+            $out['errors'][0]['error_message'] = "Invalid payload";
+            $out['errors'][0]['location'] = "postbackReceive";
+        } else {
+            $out = $ret;
+        }
+
+        return $out;
+
+    }
 
 
 
     // ----------------------------------
-	// Realm calls
-	// -----------------------------------
+    // Realm calls
+    // -----------------------------------
 
 
     /**
      * Get realm info
      *
-     * @param string  $realm_key_id Realm key id
+     * @param string $realm_key_id Realm key id
      *  domain, logo_url,crypto_suite)
      * @return array(realm_id, open_enrollment, display_name, ip_address,
      */
     function realmGet()
     {
-        $args = ['method' => 'realm.realm_get'];
+        $args = array(
+            'method' => 'realm.realm_get'
+        );
 
         $realm = $this->rawCall($args);
 
@@ -671,24 +698,24 @@ class Tozny_Remote_Realm_API
 
     function realmUpdate($realm)
     {
-        $args = ['method' => 'realm.realm_update'];
-		foreach($realm as $k => $v){
-		   $args[$k] = $v;	
-		}
+        $args = array(
+            'method' => 'realm.realm_update'
+        );
+        foreach ($realm as $k => $v) {
+            $args[$k] = $v;
+        }
 
         return $this->rawCall($args);
     }
 
 
-
-
     /**
      * This decodes signed data
      *
-     * @param string  $signed_data
+     * @param string $signed_data
      * @return unknown
      */
-    function decodeSignedData( $signed_data )
+    function decodeSignedData($signed_data)
     {
         return json_decode($this->_base64UrlDecode($signed_data), true);
     }
@@ -698,18 +725,20 @@ class Tozny_Remote_Realm_API
      *
      *
      * @param unknown $key_ids (optional)
-     * @param unknown $rows    (optional)
-     * @param unknown $offset  (optional)
-     * @param unknown $page    (optional)
+     * @param unknown $rows (optional)
+     * @param unknown $offset (optional)
+     * @param unknown $page (optional)
      * @return unknown
      */
     function realmKeysGet($key_ids = NULL, $rows = 20, $offset = 0, $page = NULL)
     {
-        $args = ['method' => 'realm.keys_get',
-        'rows' => $rows,
-        'offset' => $offset,
-        'page' => $page];
-    
+        $args = array(
+            'method' => 'realm.keys_get',
+            'rows' => $rows,
+            'offset' => $offset,
+            'page' => $page
+        );
+
         if (!empty($key_ids)) {
             if (is_array($key_ids)) {
                 $args['key_id'] = implode(",", $key_ids);
@@ -733,9 +762,11 @@ class Tozny_Remote_Realm_API
      */
     function realmKeyUpdate($rki, $name = NULL, $roll = false)
     {
-        $args = ['method' => 'realm.key_update',
-        'key_id' => $rki,
-        'name' => $name];
+        $args = array(
+            'method' => 'realm.key_update',
+            'key_id' => $rki,
+            'name' => $name
+        );
 
         if ($roll) {
             $args['roll_secret_key'] = "true";
@@ -743,9 +774,6 @@ class Tozny_Remote_Realm_API
 
         return $this->rawCall($args);
     }
-
-
-
 
 
     /**
@@ -756,8 +784,10 @@ class Tozny_Remote_Realm_API
      */
     function realmKeyGet($rki)
     {
-        $args = ['method' => 'realm.key_get',
-        'key_id' => $rki];
+        $args = array(
+            'method' => 'realm.key_get',
+            'key_id' => $rki
+        );
 
         return $this->rawCall($args);
     }
@@ -771,8 +801,10 @@ class Tozny_Remote_Realm_API
      */
     function realmKeyExists($rki)
     {
-        $args = ['method' => 'realm.key_exists',
-        'key_id' => $rki];
+        $args = array(
+            'method' => 'realm.key_exists',
+            'key_id' => $rki
+        );
 
         return $this->rawCall($args);
     }
@@ -786,8 +818,10 @@ class Tozny_Remote_Realm_API
      */
     function realmKeyDelete($rki)
     {
-        $args = ['method' => 'realm.key_delete',
-        'key_id' => $rki];
+        $args = array(
+            'method' => 'realm.key_delete',
+            'key_id' => $rki
+        );
 
         return $this->rawCall($args);
     }
@@ -801,38 +835,46 @@ class Tozny_Remote_Realm_API
      */
     function realmKeyAdd($name)
     {
-        $args = ['method' => 'realm.key_add',
-        'name' => $name];
+        $args = array(
+            'method' => 'realm.key_add',
+            'name' => $name
+        );
 
         return $this->rawCall($args);
     }
 
     function realmUserDevices($user_id, $term = NULL, $page = 1, $rows = 20, $offset = 0)
     {
-        $args = ['method' => 'realm.user_devices',
-        'user_id' => $user_id
-		,'term'   => $term
-		,'page'   => $page
-		,'rows'   => $rows
-		,'offset' => $offset];
+        $args = array(
+            'method' => 'realm.user_devices',
+            'user_id' => $user_id,
+            'term' => $term,
+            'page' => $page,
+            'rows' => $rows,
+            'offset' => $offset
+        );
 
         return $this->rawCall($args);
     }
 
     function realmUserDeviceAdd($user_id)
     {
-        $args = ['method' => 'realm.user_device_add',
-        'user_id' => $user_id];
+        $args = array(
+            'method' => 'realm.user_device_add',
+            'user_id' => $user_id
+        );
 
         return $this->rawCall($args);
 
     }
-	
-	function realmUserDeviceUpdate($user_key_id, $device_description)
+
+    function realmUserDeviceUpdate($user_key_id, $device_description)
     {
-        $args = ['method' => 'realm.user_device_update',
-        'user_key_id'             => $user_key_id,
-		'device_description' => $device_description];
+        $args = array(
+            'method' => 'realm.user_device_update',
+            'user_key_id' => $user_key_id,
+            'device_description' => $device_description
+        );
 
         return $this->rawCall($args);
 
@@ -841,30 +883,36 @@ class Tozny_Remote_Realm_API
 
     function realmUserDeviceGet($user_key_id)
     {
-        $args = ['method' => 'realm.user_device_get',
-        'user_key_id' => $user_key_id];
+        $args = array(
+            'method' => 'realm.user_device_get',
+            'user_key_id' => $user_key_id
+        );
 
         return $this->rawCall($args);
     }
 
     function realmUserDeviceDelete($user_key_id)
     {
-        $args = ['method' => 'realm.user_device_delete',
-        'user_key_id' => $user_key_id];
+        $args = array(
+            'method' => 'realm.user_device_delete',
+            'user_key_id' => $user_key_id
+        );
 
         return $this->rawCall($args);
     }
 
-    function realmActivity($user_id = NULL, $realm_key_id_param = NULL, 
-        $user_key_id = NULL, $offset = 0, $rows = 20, $page = NULL)
+    function realmActivity($user_id = NULL, $realm_key_id_param = NULL,
+                           $user_key_id = NULL, $offset = 0, $rows = 20, $page = NULL)
     {
-        $args = ['method' => 'realm.activity',
-        'user_id' => $user_id,
-        'realm_key_id_param' => $realm_key_id_param,
-        'user_key_id' => $user_key_id,
-        'offset' => $offset,
-        'rows' => $rows,
-        'page' => $page];
+        $args = array(
+            'method' => 'realm.activity',
+            'user_id' => $user_id,
+            'realm_key_id_param' => $realm_key_id_param,
+            'user_key_id' => $user_key_id,
+            'offset' => $offset,
+            'rows' => $rows,
+            'page' => $page
+        );
 
         return $this->rawCall($args);
     }
@@ -875,7 +923,7 @@ class Tozny_Remote_Realm_API
      * then decode the results. Includes generation of the nonce and
      * signing of the message
      *
-     * @param array   $args an associative array for the call
+     * @param array $args an associative array for the call
      * @return array either with the response or an error
      */
     function rawCall(array $args)
@@ -888,7 +936,7 @@ class Tozny_Remote_Realm_API
             $args['realm_key_id'] = $this->_realm['realm_key_id'];
         }
 
-        $sigArr = $this->_encodeAndSignArr (json_encode($args),
+        $sigArr = $this->_encodeAndSignArr(json_encode($args),
             $this->_realm['realm_priv_key']);
         $encodedResult = file_get_contents($this->_api_url
             . "?" . http_build_query($sigArr));
@@ -907,10 +955,10 @@ class Tozny_Remote_Realm_API
     function checkSigGetData($data)
     {
         $data_payload = $data["signed_data"];
-        $sig_payload  = $data["signature"];
+        $sig_payload = $data["signature"];
 
         $sig = self::base64UrlDecode($sig_payload);
-        if ($this->checkSig ($sig, $data_payload)) {
+        if ($this->checkSig($sig, $data_payload)) {
             return json_decode(self::base64UrlDecode($data_payload), true);
         } else {
             return false;
@@ -951,13 +999,10 @@ class Tozny_Remote_Realm_API
     }
 
 
-
-
-
     /**
      * This encodes data
      *
-     * @param string  $data
+     * @param string $data
      * @return unknown
      */
     function _base64UrlEncode($data)
@@ -966,31 +1011,25 @@ class Tozny_Remote_Realm_API
     }
 
 
-
-
-
     /**
      * This decodes data
      *
-     * @param string  $data
+     * @param string $data
      * @return unknown
      */
     function _base64UrlDecode($data)
     {
         return (base64_decode(str_pad(strtr($data, '-_', '+/'),
-                    strlen($data) % 4, '=   ', STR_PAD_RIGHT)));
+            strlen($data) % 4, '=   ', STR_PAD_RIGHT)));
     }
-
-
-
 
 
     /**
      * This checks a signature
      *
-     * @param string  $dangerous_signature - signature of request
-     * @param string  $dangerous_request   - request
-     * @param string  $secret              - secret key
+     * @param string $dangerous_signature - signature of request
+     * @param string $dangerous_request - request
+     * @param string $secret - secret key
      * @return unknown
      */
     function _checkSig($dangerous_signature, $dangerous_request, $secret)
@@ -1007,31 +1046,26 @@ class Tozny_Remote_Realm_API
     }
 
 
-
-
-
-
-
-
     /**
      * Internal function to bas64 encode this json object and sign it
      *
      * @param unknown $json_data the json object to encode and sign
-     * @param unknown $secret    the signing secret
+     * @param unknown $secret the signing secret
      * @return A readied payload with signed_data and signature
      */
     function _encodeAndSignArr($json_data, $secret)
     {
         $encoded_data = self::base64UrlEncode($json_data);
-        $sig          = hash_hmac('sha256', $encoded_data, $secret, $raw = true);
-        $encoded_sig  = self::base64UrlEncode($sig);
+        $sig = hash_hmac('sha256', $encoded_data, $secret, $raw = true);
+        $encoded_sig = self::base64UrlEncode($sig);
 
-        return (["signed_data" => $encoded_data
-            , "signature"   => $encoded_sig]);
+        return (
+        array(
+            "signed_data" => $encoded_data,
+            "signature" => $encoded_sig
+        )
+        );
     }
-
-
-
 
 
     /**
@@ -1047,7 +1081,7 @@ class Tozny_Remote_Realm_API
         foreach ($options as $f) {
             if (!empty($checkme[$f])) {
                 $output[$f] = $checkme[$f];
-            }else {
+            } else {
                 $output[$f] = NULL;
             }
         }
@@ -1059,7 +1093,7 @@ class Tozny_Remote_Realm_API
      * encode according to rfc4648 for url-safe base64 encoding
      *
      *
-     * @param string  $data The data to encode
+     * @param string $data The data to encode
      * @return The encoded data
      */
     static function base64UrlEncode($data)
@@ -1068,21 +1102,22 @@ class Tozny_Remote_Realm_API
     }
 
 
-
     /**
      * decode according to rfc4648 for url-safe base64 encoding
      *
      *
-     * @param string  $data The data to decode
+     * @param string $data The data to decode
      * @return The decoded data
      */
     static function base64UrlDecode($data)
     {
         return (base64_decode(str_pad(strtr($data, '-_', '+/'),
-                    strlen($data) % 4, '=   ', STR_PAD_RIGHT)));
+            strlen($data) % 4, '=   ', STR_PAD_RIGHT)));
     }
 
 
-}// Tozny_Remote_Realm_API class
+}
+
+// Tozny_Remote_Realm_API class
 
 ?>

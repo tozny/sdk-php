@@ -78,15 +78,15 @@ class Tozny_Remote_User_API
                 break;
             }
         }
-		
-		# if we couldnt find it, see if it's packaged as a library for distribution
+
+        # if we couldnt find it, see if it's packaged as a library for distribution
         if (!$foundCommon) {
             if (file_exists(__DIR__.'/tozny_common/OCRAWrapper.php')) {
-               set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ . '/tozny_common');
-			   $foundCommon = true;
-			}
+                set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ . '/tozny_common');
+                $foundCommon = true;
+            }
         }
-		
+
         # if we couldnt find it, add the /var/www/library/tozny_common directory exists and is readable, then add it to the include path.
         if (!$foundCommon) {
             if (!file_exists('/var/www/library/tozny_common/OCRAWrapper.php')) {
@@ -120,8 +120,7 @@ class Tozny_Remote_User_API
      */
     function realmGet()
     {
-        $decodedValue = $this->rawCall(['method' => 'user.realm_get'
-            , 'realm_key_id'  => $this->_realm_key_id]);
+        $decodedValue = $this->rawCall(array('method' => 'user.realm_get', 'realm_key_id'  => $this->_realm_key_id));
         return $decodedValue;
     }
 
@@ -134,8 +133,7 @@ class Tozny_Remote_User_API
      */
     function loginChallenge()
     {
-        $decodedValue = $this->rawCall (['method' => 'user.login_challenge',
-            'realm_key_id' => $this->_realm_key_id]);
+        $decodedValue = $this->rawCall (array('method' => 'user.login_challenge','realm_key_id' => $this->_realm_key_id));
         //TODO: Handle error
         $this->_challenge = $decodedValue;
         return $decodedValue;
@@ -169,19 +167,19 @@ class Tozny_Remote_User_API
      */
     function loginResultRaw($user, $challenge, $type = 'HMAC')
     {
-        $args = ['method'       => 'user.login_result',
+        $args = array('method'       => 'user.login_result',
             'realm_key_id' => $this->_realm_key_id,
             'user_id'      => $user['user_id'],
             'user_key_id'  => $user['user_key_id'],
-            'session_id'   => $challenge['session_id']];
+            'session_id'   => $challenge['session_id']);
 
         $response = '';
 
         if ($type == 'HMAC') {
             $response = $this->_ocra_wrapper->calculateResponse(
-                    $user['user_secret'], $challenge['challenge'], $challenge['session_id']);
+                $user['user_secret'], $challenge['challenge'], $challenge['session_id']);
         } else if ($type == 'RSA') {
-            $data = array('challenge' => $challenge['challenge'], 
+            $data = array('challenge' => $challenge['challenge'],
                 'session_id' => $challenge['session_id']);
 
             $sig = '';
@@ -210,9 +208,9 @@ class Tozny_Remote_User_API
         //TODO: Handle errors
         return $signed_data;
     }
-	
-	
-	/**
+
+
+    /**
      * Like login_result, but doesn't require that login_challenge be called.
      *
      * @param Tozny_User The user for this login.
@@ -224,20 +222,21 @@ class Tozny_Remote_User_API
      */
     function questionResultRaw($user, $challenge, $answer, $type = 'HMAC')
     {
-        $args = ['method'       => 'user.question_result',
+        $args = array(
+            'method'       => 'user.question_result',
             'realm_key_id' => $this->_realm_key_id,
             'user_id'      => $user['user_id'],
             'user_key_id'  => $user['user_key_id'],
             'session_id'   => $challenge['session_id'],
-			'answer'       => $answer];
+            'answer'       => $answer);
 
         $response = '';
 
         if ($type == 'HMAC') {
             $response = $this->_ocra_wrapper->calculateResponse(
-                    $user['user_secret'], $challenge['challenge'], $challenge['session_id']);
+                $user['user_secret'], $challenge['challenge'], $challenge['session_id']);
         } else if ($type == 'RSA') {
-            $data = array('challenge' => $challenge['challenge'], 
+            $data = array('challenge' => $challenge['challenge'],
                 'session_id' => $challenge['session_id']);
 
             $sig = '';
@@ -278,10 +277,12 @@ class Tozny_Remote_User_API
      */
     function userAdd($defer = 'false', $metadata = NULL, $pub_key = NULL)
     {
-        $args = ['method'       => 'user.user_add',
-                 'defer'        => $defer,
-                 'pub_key'      => $pub_key,
-                 'realm_key_id' => $this->_realm_key_id];
+        $args = array(
+            'method'       => 'user.user_add',
+            'defer'        => $defer,
+            'pub_key'      => $pub_key,
+            'realm_key_id' => $this->_realm_key_id
+        );
 
         if (!empty($metadata)) {
             $extras = self::base64UrlEncode(json_encode($metadata));
@@ -303,9 +304,7 @@ class Tozny_Remote_User_API
      */
     function userAddComplete($user_temp_key)
     {
-        $newUser = $this->rawCall(['method'       => 'user.user_add_complete'
-            , 'user_temp_key' => $user_temp_key
-            , 'realm_key_id' => $this->_realm_key_id]);
+        $newUser = $this->rawCall(array('method' => 'user.user_add_complete', 'user_temp_key' => $user_temp_key  , 'realm_key_id' => $this->_realm_key_id));
         return $newUser;
     }
 
@@ -318,9 +317,7 @@ class Tozny_Remote_User_API
      */
     function checkSessionStatus($session_id)
     {
-        $check = $this->rawCall (['method'     => 'user.check_session_status'
-            , 'session_id' => $session_id
-            , 'realm_key_id' => $this->_realm_key_id]);
+        $check = $this->rawCall (array('method' => 'user.check_session_status', 'session_id' => $session_id, 'realm_key_id' => $this->_realm_key_id));
         return $check;
     }
 
@@ -333,9 +330,11 @@ class Tozny_Remote_User_API
      */
     function qrAddComplete($user_temp_key)
     {
-        $args = ['method'        => 'user.qr_add_complete'
-        , 'user_temp_key' => $user_temp_key
-        , 'realm_key_id'  => $this->_realm_key_id];
+        $args = array(
+            'method'        => 'user.qr_add_complete',
+            'user_temp_key' => $user_temp_key,
+            'realm_key_id'  => $this->_realm_key_id
+        );
         $url = $this->_api_url . "?" . http_build_query($args);
         $strImg = file_get_contents($url);
         return $strImg;
@@ -362,10 +361,11 @@ class Tozny_Remote_User_API
      */
     function qrLoginChallengeRaw($challenge)
     {
-        $args = ['method'        => 'user.qr_login_challenge'
-        , 'challenge'     => $challenge['challenge']
-        , 'session_id'    => $challenge['session_id']
-        , 'realm_key_id'  => $this->_realm_key_id];
+        $args = array('method' => 'user.qr_login_challenge',
+            'challenge'     => $challenge['challenge'],
+            'session_id'    => $challenge['session_id'],
+            'realm_key_id'  => $this->_realm_key_id
+        );
         $url = $this->_api_url . "?" . http_build_query($args);
         $strImg = file_get_contents($url);
         return $strImg;

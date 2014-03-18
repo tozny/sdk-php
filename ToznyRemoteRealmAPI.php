@@ -351,6 +351,24 @@ class Tozny_Remote_Realm_API
         );
     }
 
+    /**
+     * Get a user from the given realm identified by the given email address.
+     *
+     * @param string $email the email value to locate a user by
+     * @return array user_id, metadata
+     */
+    function userGetEmail($email)
+    {
+        $args = array(
+            'method'      => 'realm.user_get',
+            'tozny_email' => $email
+        );
+
+        $user_arr = $this->rawCall($args);
+        //TODO: Handle errors
+
+        return $user_arr['results'];
+    }
 
     /**
      * Delete the given user

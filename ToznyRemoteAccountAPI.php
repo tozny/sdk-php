@@ -78,6 +78,10 @@ class Tozny_Remote_Account_API
         $this->_account['realm_key'] = $account_realm;
     }
 
+    function paymentMethodAdd($realm_id, $payment_token) {
+        $args = array('method' => 'account.payment_method_add', 'realm_id' => $realm_id, 'payment_token' => $payment_token);
+        return $this->rawCall($args);
+    }
 
     /**
      * Get's the list of realms for this account

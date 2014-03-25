@@ -199,7 +199,7 @@ class Tozny_Remote_Realm_API
      * Add this user to the given realm.
      *
      * @param string $defer (optional) Whether to use deferred enrollment. Defaults false.
-     * @param unknown $metadata (optional)
+     * @param array $metadata (optional)
      * @return The Tozny_API_User object if successful, otherwise false.
      */
     function userAdd($defer = 'false', $metadata = NULL)
@@ -364,10 +364,21 @@ class Tozny_Remote_Realm_API
             'tozny_email' => $email
         );
 
-        $user_arr = $this->rawCall($args);
-        //TODO: Handle errors
+        $response = $this->rawCall($args);
+        if ($response['return'] === 'ok') {
+            return $response['results'];
+        } else {
+            $getStatus = function($err){return $err['status_code'];};
+            $filt404s  = function($s) {return $s === 404;};
+            $has404 = count(array_filter(array_map($getStatus, $response['errors']),$filt404s)) > 0;
+            if ($has404) {
+                return false;
+            }
+            else {
+                throw new Exception("Unexpected Response from server:".json_encode($response));
+            }
+        }
 
-        return $user_arr['results'];
     }
 
     /**

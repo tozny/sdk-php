@@ -83,6 +83,11 @@ class Tozny_Remote_Account_API
         return $this->rawCall($args);
     }
 
+    function paymentMethodUpdate($realm_id, $realm_payment_method_id) {
+        $args = array('method' => 'account.payment_method_add', 'realm_id' => $realm_id, 'realm_payment_method_id' => $realm_payment_method_id);
+        return $this->rawCall($args);
+    }
+
     /**
      * Get's the list of realms for this account
      *

@@ -84,7 +84,7 @@ class Tozny_Remote_Account_API
     }
 
     function paymentMethodUpdate($realm_id, $realm_payment_method_id) {
-        $args = array('method' => 'account.payment_method_add', 'realm_id' => $realm_id, 'realm_payment_method_id' => $realm_payment_method_id);
+        $args = array('method' => 'account.payment_method_update', 'realm_id' => $realm_id, 'realm_payment_method_id' => $realm_payment_method_id);
         return $this->rawCall($args);
     }
 

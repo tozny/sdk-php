@@ -77,6 +77,10 @@ class Tozny_Remote_Account_API
         $this->_account['priv_key'] = $account_priv_key;
         $this->_account['realm_key'] = $account_realm;
     }
+    function paymentMethodsGet() {
+        $args = array('method' => 'account.payment_methods_get');
+        return $this->rawCall($args);
+    }
     function paymentMethodGet($realm_id) {
         $args = array('method' => 'account.payment_method_get', 'realm_id' => $realm_id);
         return $this->rawCall($args);

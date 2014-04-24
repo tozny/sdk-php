@@ -179,21 +179,23 @@ class Tozny_Remote_User_API
             $response = $this->_ocra_wrapper->calculateResponse(
                 $user['user_secret'], $challenge['challenge'], $challenge['session_id']);
         } else if ($type == 'RSA') {
-            $data = array('challenge' => $challenge['challenge'],
-                'session_id' => $challenge['session_id']);
+            $payload = $this->base64UrlEncode(json_encode(array(
+                'challenge'  => $challenge['challenge'],
+                'session_id' => $challenge['session_id'],
+                'expires_at' => time() + 60 * 5
+            )));
 
-            $sig = '';
-            openssl_sign(json_encode($data), $sig, $user['user_secret'], OPENSSL_ALGO_SHA256);
+            if (!openssl_sign(
+                $payload,
+                $signature,
+                $user['user_secret'],
+                OPENSSL_ALGO_SHA256
+            )) {return false;}
 
-            if ($sig == '') {
-                return false;
-            }
+            $envelope['signed_data'] = $payload;
+            $envelope['signature']   = $this->base64UrlEncode($signature);
 
-            $base = new Tozny_BASE();
-
-            $data['signature'] = $base->base64UrlEncode($sig);
-
-            $response = json_encode($data);
+            $response = json_encode($envelope);
 
             $args['login_type'] = 'RSA';
         }

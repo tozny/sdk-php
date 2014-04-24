@@ -167,22 +167,28 @@ class Tozny_Remote_User_API
      */
     function loginResultRaw($user, $challenge, $type = 'HMAC')
     {
-        $args = array('method'       => 'user.login_result',
+        $args = array(
+            'method'       => 'user.login_result',
             'realm_key_id' => $this->_realm_key_id,
             'user_id'      => $user['user_id'],
             'user_key_id'  => $user['user_key_id'],
-            'session_id'   => $challenge['session_id']);
+            'session_id'   => $challenge['session_id']
+        );
 
         $response = '';
 
         if ($type == 'HMAC') {
             $response = $this->_ocra_wrapper->calculateResponse(
-                $user['user_secret'], $challenge['challenge'], $challenge['session_id']);
-        } else if ($type == 'RSA') {
+                $user['user_secret'],
+                $challenge['challenge'],
+                $challenge['session_id']
+            );
+        }
+        else if ($type == 'RSA') {
             $payload = $this->base64UrlEncode(json_encode(array(
                 'challenge'  => $challenge['challenge'],
                 'session_id' => $challenge['session_id'],
-                'expires_at' => time() + 60 * 5
+                'expires_at' => time() + 60 * 5 // server-side check is 5 min
             )));
 
             if (!openssl_sign(
@@ -230,29 +236,36 @@ class Tozny_Remote_User_API
             'user_id'      => $user['user_id'],
             'user_key_id'  => $user['user_key_id'],
             'session_id'   => $challenge['session_id'],
-            'answer'       => $answer);
+            'answer'       => $answer
+        );
 
         $response = '';
 
         if ($type == 'HMAC') {
             $response = $this->_ocra_wrapper->calculateResponse(
-                $user['user_secret'], $challenge['challenge'], $challenge['session_id']);
-        } else if ($type == 'RSA') {
-            $data = array('challenge' => $challenge['challenge'],
-                'session_id' => $challenge['session_id']);
+                $user['user_secret'],
+                $challenge['challenge'],
+                $challenge['session_id']
+            );
+        }
+        else if ($type == 'RSA') {
+            $payload = $this->base64UrlEncode(json_encode(array(
+                'challenge'  => $challenge['challenge'],
+                'session_id' => $challenge['session_id'],
+                'expires_at' => time() + 60 * 5 // server-side check is 5 min
+            )));
 
-            $sig = '';
-            openssl_sign(json_encode($data), $sig, $user['user_secret'], OPENSSL_ALGO_SHA256);
+            if (!openssl_sign(
+                $payload,
+                $signature,
+                $user['user_secret'],
+                OPENSSL_ALGO_SHA256
+            )) {return false;}
 
-            if ($sig == '') {
-                return false;
-            }
+            $envelope['signed_data'] = $payload;
+            $envelope['signature']   = $this->base64UrlEncode($signature);
 
-            $base = new Tozny_BASE();
-
-            $data['signature'] = $base->base64UrlEncode($sig);
-
-            $response = json_encode($data);
+            $response = json_encode($envelope);
 
             $args['login_type'] = 'RSA';
         }

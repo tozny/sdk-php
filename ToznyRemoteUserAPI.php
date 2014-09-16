@@ -64,8 +64,9 @@ class Tozny_Remote_User_API
     /**
      * Build this class based on the remote site's key ID.
      *
-     * @param unknown $in_realm_key_id
-     * @param unknown $in_api_url      (optional)
+     * @param string $in_realm_key_id
+     * @param string $in_api_url      (optional)
+     * @throws Exception if the Tozny common libraries were not found
      */
     function __construct( $in_realm_key_id, $in_api_url = NULL)
     {
@@ -129,7 +130,7 @@ class Tozny_Remote_User_API
      * Return the login challenge for this realm. Can return an error
      * if the realm does not exist.
      *
-     * @return Tozny_Challenge | error
+     * @return string | boolean - the Tozny_Challenge or false on error.
      */
     function loginChallenge()
     {

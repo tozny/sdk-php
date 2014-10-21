@@ -87,7 +87,7 @@ class Tozny_Remote_Realm_API
      *
      * @param string $signed_data - who's logging in
      * @param string $signature - the signature for the payload
-     * @return unknown
+     * @return mixed the decoded JSON data or FALSE
      */
     function verifyLogin($signed_data, $signature)
     {
@@ -270,10 +270,9 @@ class Tozny_Remote_Realm_API
             'user_id' => $user_id
         );
 
-        $user_arr = $this->rawCall($args);
-        //TODO: Handle errors
-
-        return $user_arr['results'];
+        $result = $this->rawCall($args);
+        if (!empty($result['results'])) {return $result['results'];}
+        throw new Exception(sprintf("Failed userGet() request: user_id %s; result: %s", $user_id, json_encode($result)));
     }
 
 
@@ -976,10 +975,9 @@ class Tozny_Remote_Realm_API
     /**
      * Checks the signatured on this data and returns the data. TODO Error checking.
      *
-     * @param Array   with 'signed_data' and 'signature'
+     * @param array $data containing 'signed_data' and 'signature'
      * or false if the signature does not match
-     * @param unknown $data
-     * @return The json_decoded, base64_decoded data
+     * @return mixed The json_decoded, base64_decoded data or FALSE
      */
     function checkSigGetData($data)
     {

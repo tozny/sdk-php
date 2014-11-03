@@ -1,34 +1,33 @@
 <?php
 /**
+ * Copyright 2013-2014 TOZNY, LLC. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ * http://aws.amazon.com/apache2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+/**
  * The Remote Tozny API.
  *
  * This is the interface for the PHP Remote API for Tozny's login system.
  *
  * PHP version 5
  *
- * LICENSE: Copyright Tozny LLC, All Rights Reserved
  *
  * @category   Security
- * @copyright  2013 Tozny LLC
+ * @copyright  2014 Tozny LLC
  * @version    git: $Id$
  * @link       https://www.tozny.com
  * @since      File available since Release 1.0
  * @author     Isaac Potoczny-Jones <ijones@tozny.com>
  * @package    Tozny
- */
-
-
-/**
- * The Remote Tozny AccountAPI
- *
- * This is the interface for the PHP Remote User API for Tozny's login system.
- *
- * @category   Security
- * @package    Tozny
- * @author     Isaac Potoczny-Jones <ijones@tozny.com>
- * @copyright  2013 Tozny LLC
- * @link       https://www.tozny.com
- * @since      Class available since Release 1.0
  */
 class Tozny_Remote_Account_API
 {

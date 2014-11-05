@@ -49,7 +49,6 @@ class Tozny_Remote_User_API
      * @var Tozny_Challenge
      */
     private $_challenge;
-    private $_ocra_wrapper;
     private $_api_url;
 
     const DEFAULT_OCRA_SUITE = "OCRA-1:HOTP-SHA1-6:QH10-S";
@@ -93,7 +92,6 @@ class Tozny_Remote_User_API
         require_once 'OCRAWrapper.php';
 
         $this->_realm_key_id = $in_realm_key_id;
-        $this->_ocra_wrapper = new Tiqr_OCRAWrapper(self::DEFAULT_OCRA_SUITE);
 
         if ($in_api_url) {
             $this->_api_url = $in_api_url;
@@ -160,7 +158,7 @@ class Tozny_Remote_User_API
      * @param unknown $challenge
      * @return array result, which is a signed payload
      */
-    function loginResultRaw($user, $challenge, $type = 'HMAC')
+    function loginResultRaw($user, $challenge, $type = 'RSA')
     {
         $args = array(
             'method'       => 'user.login_result',
@@ -173,11 +171,7 @@ class Tozny_Remote_User_API
         $response = '';
 
         if ($type == 'HMAC') {
-            $response = $this->_ocra_wrapper->calculateResponse(
-                $user['user_secret'],
-                $challenge['challenge'],
-                $challenge['session_id']
-            );
+            return false;
         }
         else if ($type == 'RSA') {
             $payload = $this->base64UrlEncode(json_encode(array(
@@ -223,7 +217,7 @@ class Tozny_Remote_User_API
      * @param unknown $challenge
      * @return array result, which is a signed payload
      */
-    function questionResultRaw($user, $challenge, $answer, $type = 'HMAC')
+    function questionResultRaw($user, $challenge, $answer, $type = 'RSA')
     {
         $args = array(
             'method'       => 'user.question_result',
@@ -237,11 +231,7 @@ class Tozny_Remote_User_API
         $response = '';
 
         if ($type == 'HMAC') {
-            $response = $this->_ocra_wrapper->calculateResponse(
-                $user['user_secret'],
-                $challenge['challenge'],
-                $challenge['session_id']
-            );
+            return false;
         }
         else if ($type == 'RSA') {
             $payload = $this->base64UrlEncode(json_encode(array(

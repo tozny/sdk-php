@@ -202,12 +202,19 @@ class Tozny_Remote_Realm_API
      * @param array $metadata (optional)
      * @return The Tozny_API_User object if successful, otherwise false.
      */
-    function userAdd($defer = 'false', $metadata = NULL)
+    function userAdd($defer = 'false', $metadata = NULL, $pub_key = NULL)
     {
         $args = array(
-            'method' => 'realm.user_add',
-            'defer' => $defer
+            'method'  => 'realm.user_add',
+            'defer'   => $defer,
         );
+
+        // You must give a pub_key param, if you are not deferring enrollment.
+        if ($defer === 'false') {
+            if (!empty($pub_key)) $args['pub_key'] = $pub_key;
+            else throw new Exception("Cannot enroll without a public key! Did you mean to defer enrollment?");
+        }
+
         if (!empty ($metadata)) {
 
             $extras = self::base64UrlEncode(json_encode($metadata));

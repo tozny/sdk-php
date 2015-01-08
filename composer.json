@@ -1,0 +1,10 @@
+{
+    "name": "tozny/sdk-php",
+    "description": "PHP wrappers for the Tozny API",
+    "homepage": "http://github.com/tozny/sdk-php",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.0"
+    }
+}

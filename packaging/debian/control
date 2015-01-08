@@ -1,5 +1,5 @@
 Package: tozny-api-php-client
-Version: 1.0.2
+Version: 1.2.0
 Maintainer: Kirk Peterson<kirk@tozny.com>
 Architecture: all
 Depends: apache2, php5, php5-json, php5-curl

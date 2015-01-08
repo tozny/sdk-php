@@ -124,11 +124,62 @@ class Tozny_Remote_Realm_API
     }
 
 
+    /**
+     * An alias for questionChallengeText.
+     *
+     * @param $question
+     * @param null $user_id
+     * @return mixed The response from the Tozny API
+     */
     function questionChallenge($question, $user_id = NULL)
+    {
+        if (is_string($question))
+            return $this->questionChallengeText($question, $user_id);
+        else if (is_array($question))
+            return $this->_callQuestionChallenge($question, $user_id);
+        else
+            return false;
+    }
+
+    /**
+     * Creates a text question challenge session.
+     *
+     * @param $question
+     * @param null $user_id
+     * @return mixed The response from the Tozny API
+     */
+    function questionChallengeText($question, $user_id = NULL)
+    {
+        $question = array(
+            "type" => "question",
+            "question" => $question
+        );
+        return $this->_callQuestionChallenge($question, $user_id);
+    }
+
+    /**
+     * Creates a callback question challenge session.
+     *
+     * @param $successURL The URL the user's mobile browser should be redirected to after successful authentication.
+     * @param $errorURL T The URL the user's mobile browser should be redirected to after unsuccessful authentication.
+     * @param null $user_id
+     * @return mixed The response from the Tozny API
+     */
+    function questionChallengeCallback($successURL, $errorURL, $user_id = NULL)
+    {
+        $question = array(
+            "type"    => "callback",
+            "success" => $successURL,
+            "error"   => $errorURL
+        );
+        return $this->_callQuestionChallenge($question, $user_id);
+    }
+
+    function _callQuestionChallenge($question, $user_id = NULL)
     {
         $args = array(
             'method' => 'realm.question_challenge',
-            'question' => $question
+            'question' => json_encode($question)
         );
 
         if (!empty($user_id)) {

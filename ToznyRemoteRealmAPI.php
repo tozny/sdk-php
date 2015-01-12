@@ -144,8 +144,8 @@ class Tozny_Remote_Realm_API
     /**
      * Creates a text question challenge session.
      *
-     * @param $question
-     * @param null $user_id
+     * @param $question string The text to display to the user before signing the Tozny question challenge.
+     * @param  $user_id $user_id The user that should answer the question.
      * @return mixed The response from the Tozny API
      */
     function questionChallengeText($question, $user_id = NULL)
@@ -160,15 +160,17 @@ class Tozny_Remote_Realm_API
     /**
      * Creates a callback question challenge session.
      *
-     * @param $successURL The URL the user's mobile browser should be redirected to after successful authentication.
-     * @param $errorURL T The URL the user's mobile browser should be redirected to after unsuccessful authentication.
-     * @param null $user_id
+     * @param $question string The text to display to the user before signing the Tozny question challenge.
+     * @param $successURL string The URL the user's mobile browser should be redirected to after successful authentication.
+     * @param $errorURL string The URL the user's mobile browser should be redirected to after unsuccessful authentication.
+     * @param $user_id string The user that should answer the question.
      * @return mixed The response from the Tozny API
      */
-    function questionChallengeCallback($successURL, $errorURL, $user_id = NULL)
+    function questionChallengeCallback($question, $successURL, $errorURL, $user_id = NULL)
     {
         $question = array(
             "type"    => "callback",
+            "question" => $question,
             "success" => $successURL,
             "error"   => $errorURL
         );

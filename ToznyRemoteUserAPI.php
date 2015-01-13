@@ -178,6 +178,25 @@ class Tozny_Remote_User_API
         return $signed_data;
     }
 
+    /**
+     * Retrieves the question description.
+     * @param string $session_id The session Id a question was asked for.
+     * @return array The Question description.
+     * @throws Exception if an error occurs while retrieving the question description.
+     */
+    function questionGet($session_id)
+    {
+        $args = array(
+            'method'       => 'user.question_get',
+            'session_id'   => $session_id,
+            'realm_key_id' => $this->_realm_key_id
+        );
+        $question = $this->rawCall($args);
+
+        if (empty($question['errors'][0]['error_message'])) return $question;
+
+        throw new Exception($question['errors'][0]['error_message']);
+    }
 
     /**
      * Like login_result, but doesn't require that login_challenge be called.

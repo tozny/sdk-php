@@ -123,12 +123,10 @@ class Tozny_Remote_User_API
     /**
      * Like login_result, but doesn't require that login_challenge be called.
      *
-     * @param Tozny_User The user for this login.
-     * @param Tozny_Challenge The challenge
-     * if the login was successful | error
-     * @param unknown $user
-     * @param unknown $challenge
-     * @return array result, which is a signed payload
+     *
+     * @param array $user The user for this login.
+     * @param array $challenge The challenge
+     * @return array if the login was successful | error
      */
     function loginResultRaw($user, $challenge, $type = 'RSA')
     {
@@ -201,12 +199,10 @@ class Tozny_Remote_User_API
     /**
      * Like login_result, but doesn't require that login_challenge be called.
      *
-     * @param Tozny_User The user for this login.
-     * @param Tozny_Challenge The challenge
-     * if the login was successful | error
-     * @param unknown $user
-     * @param unknown $challenge
-     * @return array result, which is a signed payload
+     * @param array $user The user for this login.
+     * @param array $challenge The challenge.
+     * @param string $answer The answer to the question.
+     * @return array if the login was successful | error
      */
     function questionResultRaw($user, $challenge, $answer, $type = 'RSA')
     {
@@ -263,8 +259,8 @@ class Tozny_Remote_User_API
      * Add this user to the given realm.
      *
      * @param string  $defer    (optional) Whether to use deferred enrollment. Defaults false.
-     * @param unknown $metadata (optional)
-     * @return The Tozny_API_User object if successful.
+     * @param array $metadata (optional)
+     * @return array The Tozny_API_User object if successful.
      */
     function userAdd($defer = 'false', $metadata = NULL, $pub_key = NULL)
     {
@@ -291,7 +287,7 @@ class Tozny_Remote_User_API
      * For deferred user enrollment, complete the enrollment
      *
      * @param string  $user_temp_key The temporary user key
-     * @return The new user data.
+     * @return array The new user data.
      */
     function userAddComplete($user_temp_key)
     {
@@ -304,7 +300,7 @@ class Tozny_Remote_User_API
      * Check whether this session is expired, failed, or succeeded.
      *
      * @param string  $session_id
-     * @return The status json object.
+     * @return array The status json object.
      */
     function checkSessionStatus($session_id)
     {
@@ -317,7 +313,7 @@ class Tozny_Remote_User_API
      * Get the QR code for the add_complete call
      *
      * @param string  $user_temp_key
-     * @return A string representing a PNG of the QR code. Use imagecreatefromstring to convert this to an image resource.
+     * @return string A string representing a PNG of the QR code. Use imagecreatefromstring to convert this to an image resource.
      */
     function qrAddComplete($user_temp_key)
     {
@@ -336,7 +332,7 @@ class Tozny_Remote_User_API
      * Get the QR code representing the login_challenge from previously
      * callin guser.login_challenge
      *
-     * @return A string representing a PNG of the QR code. Use imagecreatefromstring to convert this to an image resource.
+     * @return string A string representing a PNG of the QR code. Use imagecreatefromstring to convert this to an image resource.
      */
     function qrLoginChallenge()
     {
@@ -383,7 +379,7 @@ class Tozny_Remote_User_API
      *
      *
      * @param string  $data The data to encode
-     * @return The encoded data
+     * @return string The encoded data
      */
     static function base64UrlEncode($data)
     {

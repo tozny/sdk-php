@@ -328,5 +328,3 @@ class Tozny_Remote_Account_API
 }
 
 // Tozny_Remote_Account_API class
-
-?>

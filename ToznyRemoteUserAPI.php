@@ -387,5 +387,3 @@ class Tozny_Remote_User_API
     }
 
 }// Tozny_Remote_User_API class
-
-?>

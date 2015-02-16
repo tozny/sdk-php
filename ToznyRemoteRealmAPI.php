@@ -280,19 +280,6 @@ class Tozny_Remote_Realm_API
     }
 
 
-    /* TODO */
-
-
-    /**
-     *
-     *
-     * @param unknown $user_temp_key
-     */
-    function userAddComplete($user_temp_key)
-    {
-
-    }
-
 
     /**
      * Update a user's metadata
@@ -1206,5 +1193,3 @@ class Tozny_Remote_Realm_API
 }
 
 // Tozny_Remote_Realm_API class
-
-?>

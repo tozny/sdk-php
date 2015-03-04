@@ -20,3 +20,11 @@ Can be installed with composer:
 ```
 
 We'll be in packagist at some point.
+
+
+Packaging (via Docker)
+======================
+Building a ubuntu/debian .deb package can be done using the included Dockerfile & Makefile
+```
+make package
+```

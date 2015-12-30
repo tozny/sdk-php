@@ -11,4 +11,4 @@ COPY *.php /tozny-sdk-php/
 COPY packaging /tozny-sdk-php/packaging/
 
 WORKDIR /tozny-sdk-php
-CMD ./packaging/debian/create_package.sh target/
+ENTRYPOINT ["./packaging/debian/create_package.sh", "target/"]

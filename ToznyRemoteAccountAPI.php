@@ -47,8 +47,8 @@ class Tozny_Remote_Account_API
      * Build this class based on the remote site's key ID.
      *
      * @param string $user_id
-     * @param unknown $account_priv
-     * @param unknown $in_api_url (optional)
+     * @param string $account_priv
+     * @param string $in_api_url (optional)
      */
     function __construct($user_id, $account_priv, $account_realm, $in_api_url = NULL)
     {

@@ -136,8 +136,8 @@ class Tozny_Remote_User_API
             'user_id'      => $user['user_id'],
             'user_key_id'  => $user['user_key_id'],
             'session_id'   => $challenge['session_id'],
-            'push_token'   => $user['push_token'] ?: '',    // not required
-            'push_platform'=> $user['push_platform'] ?: ''  // not required
+            'push_token'   => isset($user['push_token']) ? $user['push_token'] : '',    // not required
+            'push_platform'=> isset($user['push_platform']) ? $user['push_platform'] : ''  // not required
         );
 
         $response = '';

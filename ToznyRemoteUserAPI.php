@@ -297,6 +297,47 @@ class Tozny_Remote_User_API
         return $newUser;
     }
 
+    /**
+     * Perform a user OTP request
+     *
+     * @param string $presence - presence token
+     * @param string $destination - email or phone number
+     * @param string $type - email, sms-otp-6, sms-otp-8
+     * @return Success or error json objects.
+     */
+    function userOTPChallenge($presence,$type=null,$destination=null)
+    {
+        return $this->rawCall(
+            array(
+                'method' => 'user.otp_challenge',
+                'realm_key_id' => $this->_realm_key_id,
+                'type' => $type,
+                'destination' => $destination,
+                'presence' => $presence
+            )
+        );
+    }
+
+    /**
+     * Perform a user OTP request
+     *
+     * @param string $presence - presence token
+     * @param string $destination - email or phone number
+     * @param string $type - email, sms-otp-6, sms-otp-8
+     * @return Success or error json objects.
+     */
+    function userOTPResult($session_id,$otp)
+    {
+        return $this->rawCall(
+            array(
+                'method' => 'user.otp_result',
+                'realm_key_id' => $this->_realm_key_id,
+                'session_id' => $session_id,
+                'otp' => $otp
+            )
+        );
+    }
+
 
     /**
      * Check whether this session is expired, failed, or succeeded.

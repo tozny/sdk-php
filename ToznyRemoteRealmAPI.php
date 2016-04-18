@@ -986,12 +986,35 @@ class Tozny_Remote_Realm_API
             'user_key_id' => $user_key_id,
             'offset' => $offset,
             'rows' => $rows,
-            'page' => $page
+            'page' => $page,
         );
 
         return $this->rawCall($args);
     }
 
+
+    /**
+     * Perform a realm OTP request
+     *
+     * @param string $presence - presence token
+     * @param string $destination - email or phone number
+     * @param string $type - email, sms-otp-6, sms-otp-8
+     * @param string $data - data to be signed along with the request
+     * @return mixed Success or error json objects.
+     */
+    function realmOTPChallenge($presence,$type=null,$destination=null, $data=null)
+    {
+        return $this->rawCall(
+            array(
+                'method' => 'realm.otp_challenge',
+                'realm_key_id' => $this->_realm['realm_key_id'],
+                'data' => $data,
+                'type' => $type,
+                'destination' => $destination,
+                'presence' => $presence,
+            )
+        );
+    }
 
     /**
      * Internal function to convert an array into a query and issue it

@@ -303,7 +303,7 @@ class Tozny_Remote_User_API
      * @param string $presence - presence token
      * @param string $destination - email or phone number
      * @param string $type - email, sms-otp-6, sms-otp-8
-     * @return Success or error json objects.
+     * @return mixed Success or error json objects.
      */
     function userOTPChallenge($presence,$type=null,$destination=null)
     {
@@ -324,7 +324,7 @@ class Tozny_Remote_User_API
      * @param string $presence - presence token
      * @param string $destination - email or phone number
      * @param string $type - email, sms-otp-6, sms-otp-8
-     * @return Success or error json objects.
+     * @return mixed Success or error json objects.
      */
     function userOTPResult($session_id,$otp)
     {

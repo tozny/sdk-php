@@ -319,6 +319,29 @@ class Tozny_Remote_User_API
     }
 
     /**
+     * Invoke a `user.email_result` call.
+     *
+     * @param string $otp The user's OTP as created by `realm.email_challenge`
+     *
+     * @return mixed If successful, this request returns a redirect to the registered callback. Otherwise it returns a JSON array.
+     */
+    function userEmailResult( $otp )
+    {
+        $params = array(
+            'method'       => 'user.email_result',
+            'realm_key_id' => $this->_realm_key_id,
+            'otp'          => $otp,
+        );
+
+        $url = $this->_api_url . '?' . http_build_query( $params );
+        $result = file_get_contents( $url );
+
+        $decoded = json_decode( $result, true );
+
+        return null === $decoded ? $result : $decoded;
+    }
+
+    /**
      * Perform a user OTP request
      *
      * @param string $presence - presence token

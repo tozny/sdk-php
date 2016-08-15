@@ -319,16 +319,16 @@ class Tozny_Remote_User_API
     }
 
     /**
-     * Invoke a `user.email_result` call.
+     * Invoke a `user.link_result` call.
      *
-     * @param string $otp The user's OTP as created by `realm.email_challenge`
+     * @param string $otp The user's OTP as created by `realm.link_challenge`
      *
      * @return mixed If successful, this request returns a redirect to the registered callback. Otherwise it returns a JSON array.
      */
-    function userEmailResult( $otp )
+    function userLinkResult( $otp )
     {
         $params = array(
-            'method'       => 'user.email_result',
+            'method'       => 'user.link_result',
             'realm_key_id' => $this->_realm_key_id,
             'otp'          => $otp,
         );

@@ -333,20 +333,23 @@ class Tozny_Remote_User_API
     /**
      * Perform a user OTP request
      *
-     * @param string $presence - presence token
-     * @param string $destination - email or phone number
-     * @param string $type - email, sms-otp-6, sms-otp-8
+     * @param string [$presence]    Presence token
+     * @param string [$type]        One of "email," "sms-otp-6," or "sms-otp-8"
+     * @param string [$destination] Email address or phone number
+     * @param string [$context]     One of "verify," "authenticate," or "enroll"
+     *
      * @return mixed Success or error json objects.
      */
-    function userOTPChallenge($presence,$type=null,$destination=null)
+    function userOTPChallenge( $presence = null, $type = null, $destination = null, $context = null )
     {
         return $this->rawCall(
             array(
-                'method' => 'user.otp_challenge',
+                'method'       => 'user.otp_challenge',
                 'realm_key_id' => $this->_realm_key_id,
-                'type' => $type,
-                'destination' => $destination,
-                'presence' => $presence
+                'type'         => $type,
+                'destination'  => $destination,
+                'presence'     => $presence,
+                'context'      => $context,
             )
         );
     }

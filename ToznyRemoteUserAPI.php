@@ -298,6 +298,39 @@ class Tozny_Remote_User_API
     }
 
     /**
+     * Send a `user.link_challenge` call signed by the current realm.
+     *
+     * @param string $destination Email address to which we will send a challenge.
+     * @param string [$context]   One of "verify," "authenticate," or "enroll"
+     * @param string [$callback]  URL to which Tozny should submit the signed email verification. If empty, we will return data rather than redirect/submit.
+     * @param string [$hostname]  Optional hostname for the generated OTP URL. If empty, will default to otp.api.tozny.com.
+     * @param bool   [$send]      Optional flag whether or not to send the email. If false, will return the OTP URL instead of sending an email.
+     *
+     * @return array
+     */
+    function userLinkChallenge( $destination, $context = null, $callback = null, $hostname = null, $send = true )
+    {
+        $params = array(
+            'method'       => 'user.link_challenge',
+            'realm_key_id' => $this->_realm_key_id,
+            'destination'  => $destination,
+            'send'         => $send ? 'yes' : 'no',
+        );
+
+        if ( ! empty( $context ) ) {
+            $params['context'] = $context;
+        }
+        if ( ! empty( $callback ) ) {
+            $params['callback'] = $callback;
+        }
+        if ( ! empty( $hostname ) ) {
+            $params['hostname'] = $hostname;
+        }
+
+        return $this->rawCall( $params );
+    }
+
+    /**
      * Perform a user OTP request
      *
      * @param string $presence - presence token

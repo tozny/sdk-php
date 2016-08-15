@@ -1004,7 +1004,7 @@ class Tozny_Remote_Realm_API
      *
      * @return array
      */
-    function realmEmailChallenge( $destination, $context = null, $callback = null, $hostname = null, $send = true )
+    function realmLinkChallenge( $destination, $context = null, $callback = null, $hostname = null, $send = true )
     {
         $params = array(
             'method'       => 'realm.link_challenge',

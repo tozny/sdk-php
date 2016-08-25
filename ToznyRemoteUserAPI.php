@@ -301,30 +301,22 @@ class Tozny_Remote_User_API
      * Send a `user.link_challenge` call signed by the current realm.
      *
      * @param string $destination Email address to which we will send a challenge.
+     * @param string $endpoint    URL endpoint to be used as a base for the challenge link
      * @param string [$context]   One of "verify," "authenticate," or "enroll"
-     * @param string [$callback]  URL to which Tozny should submit the signed email verification. If empty, we will return data rather than redirect/submit.
-     * @param string [$hostname]  Optional hostname for the generated OTP URL. If empty, will default to otp.api.tozny.com.
-     * @param bool   [$send]      Optional flag whether or not to send the email. If false, will return the OTP URL instead of sending an email.
      *
      * @return array
      */
-    function userLinkChallenge( $destination, $context = null, $callback = null, $hostname = null, $send = true )
+    function userLinkChallenge( $destination, $endpoint, $context = null )
     {
         $params = array(
             'method'       => 'user.link_challenge',
             'realm_key_id' => $this->_realm_key_id,
             'destination'  => $destination,
-            'send'         => $send ? 'yes' : 'no',
+            'endpoint'     => $endpoint,
         );
 
         if ( ! empty( $context ) ) {
             $params['context'] = $context;
-        }
-        if ( ! empty( $callback ) ) {
-            $params['callback'] = $callback;
-        }
-        if ( ! empty( $hostname ) ) {
-            $params['hostname'] = $hostname;
         }
 
         return $this->rawCall( $params );
@@ -363,26 +355,21 @@ class Tozny_Remote_User_API
      */
     function userLinkResult( $otp )
     {
-        $params = array(
-            'method'       => 'user.link_result',
-            'realm_key_id' => $this->_realm_key_id,
-            'otp'          => $otp,
+        return $this->rawCall(
+            array(
+                'method'       => 'user.link_result',
+                'realm_key_id' => $this->_realm_key_id,
+                'otp'          => $otp,
+            )
         );
-
-        $url = $this->_api_url . '?' . http_build_query( $params );
-        $result = file_get_contents( $url );
-
-        $decoded = json_decode( $result, true );
-
-        return null === $decoded ? $result : $decoded;
     }
 
     /**
-     * Perform a user OTP request
+     * Complete an OTP challenge
      *
-     * @param string $presence - presence token
-     * @param string $destination - email or phone number
-     * @param string $type - email, sms-otp-6, sms-otp-8
+     * @param string $session_id ID of the OTP session
+     * @param string $otp        Actual OTP
+     *
      * @return mixed Success or error json objects.
      */
     function userOTPResult($session_id,$otp)
@@ -397,6 +384,32 @@ class Tozny_Remote_User_API
         );
     }
 
+    /**
+     * Exchange a signed OTP challenge (from user.link_result or user.otp_result) for either an
+     * enrollment challenge (if the original context was "enroll") or a signed user payload (if
+     * the original context was "authenticate").
+     *
+     * @param string $signed_data  Signed data payload
+     * @param string $signature    Realm-signed signature of the payload
+     * @param string [$session_id] If this was an authentication challenge, provide the session ID to close the session
+     *
+     * @return array
+     */
+    function userChallengeExchange( $signed_data, $signature, $session_id = null )
+    {
+        $params = array(
+            'method'       => 'user.challenge_exchange',
+            'realm_key_id' => $this->_realm_key_id,
+            'signed_data'  => $signed_data,
+            'signature'    => $signature,
+        );
+
+        if ( ! empty( $session_id ) ) {
+            $params['session_id'] = $session_id;
+        }
+
+        return $this->rawCall( $params );
+    }
 
     /**
      * Check whether this session is expired, failed, or succeeded.

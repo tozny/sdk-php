@@ -997,30 +997,32 @@ class Tozny_Remote_Realm_API
      * Send a `realm.link_challenge` call signed by the current realm.
      *
      * @param string $destination Email address to which we will send a challenge.
+     * @param string $endpoint    URL endpoint to be used as a base for the challenge link
+     * @param int    [$lifespan]  Number of seconds for which the link will be valid
      * @param string [$context]   One of "verify," "authenticate," or "enroll"
-     * @param string [$callback]  URL to which Tozny should submit the signed email verification. If empty, we will return data rather than redirect/submit.
-     * @param string [$hostname]  Optional hostname for the generated OTP URL. If empty, will default to otp.api.tozny.com.
      * @param bool   [$send]      Optional flag whether or not to send the email. If false, will return the OTP URL instead of sending an email.
+     * @param string [$data]      JSON-encoded string of data to be signed along with the request
      *
      * @return array
      */
-    function realmLinkChallenge( $destination, $context = null, $callback = null, $hostname = null, $send = true )
+    function realmLinkChallenge( $destination, $endpoint, $lifespan, $context = null, $send = true, $data = null )
     {
         $params = array(
             'method'       => 'realm.link_challenge',
             'realm_key_id' => $this->_realm['realm_key_id'],
             'destination'  => $destination,
+            'endpoint'     => $endpoint,
             'send'         => $send ? 'yes' : 'no',
         );
 
+        if ( ! empty( $lifespan ) ) {
+            $params['lifespan'] = $lifespan;
+        }
         if ( ! empty( $context ) ) {
             $params['context'] = $context;
         }
-        if ( ! empty( $callback ) ) {
-            $params['callback'] = $callback;
-        }
-        if ( ! empty( $hostname ) ) {
-            $params['hostname'] = $hostname;
+        if ( ! empty( $data ) ) {
+            $params['data'] = $data;
         }
 
         return $this->rawCall( $params );

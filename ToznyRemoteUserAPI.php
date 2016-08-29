@@ -298,32 +298,78 @@ class Tozny_Remote_User_API
     }
 
     /**
-     * Perform a user OTP request
+     * Send a `user.link_challenge` call signed by the current realm.
      *
-     * @param string $presence - presence token
-     * @param string $destination - email or phone number
-     * @param string $type - email, sms-otp-6, sms-otp-8
-     * @return mixed Success or error json objects.
+     * @param string $destination Email address to which we will send a challenge.
+     * @param string $endpoint    URL endpoint to be used as a base for the challenge link
+     * @param string [$context]   One of "verify," "authenticate," or "enroll"
+     *
+     * @return array
      */
-    function userOTPChallenge($presence,$type=null,$destination=null)
+    function userLinkChallenge( $destination, $endpoint, $context = null )
     {
-        return $this->rawCall(
-            array(
-                'method' => 'user.otp_challenge',
-                'realm_key_id' => $this->_realm_key_id,
-                'type' => $type,
-                'destination' => $destination,
-                'presence' => $presence
-            )
+        $params = array(
+            'method'       => 'user.link_challenge',
+            'realm_key_id' => $this->_realm_key_id,
+            'destination'  => $destination,
+            'endpoint'     => $endpoint,
         );
+
+        if ( ! empty( $context ) ) {
+            $params['context'] = $context;
+        }
+
+        return $this->rawCall( $params );
     }
 
     /**
      * Perform a user OTP request
      *
-     * @param string $presence - presence token
-     * @param string $destination - email or phone number
-     * @param string $type - email, sms-otp-6, sms-otp-8
+     * @param string [$presence]    Presence token
+     * @param string [$type]        One of "email," "sms-otp-6," or "sms-otp-8"
+     * @param string [$destination] Email address or phone number
+     * @param string [$context]     One of "verify," "authenticate," or "enroll"
+     *
+     * @return mixed Success or error json objects.
+     */
+    function userOTPChallenge( $presence = null, $type = null, $destination = null, $context = null )
+    {
+        return $this->rawCall(
+            array(
+                'method'       => 'user.otp_challenge',
+                'realm_key_id' => $this->_realm_key_id,
+                'type'         => $type,
+                'destination'  => $destination,
+                'presence'     => $presence,
+                'context'      => $context,
+            )
+        );
+    }
+
+    /**
+     * Invoke a `user.link_result` call.
+     *
+     * @param string $otp The user's OTP as created by `realm.link_challenge`
+     *
+     * @return mixed If successful, this request returns a redirect to the registered callback. Otherwise it returns a JSON array.
+     */
+    function userLinkResult( $otp )
+    {
+        return $this->rawCall(
+            array(
+                'method'       => 'user.link_result',
+                'realm_key_id' => $this->_realm_key_id,
+                'otp'          => $otp,
+            )
+        );
+    }
+
+    /**
+     * Complete an OTP challenge
+     *
+     * @param string $session_id ID of the OTP session
+     * @param string $otp        Actual OTP
+     *
      * @return mixed Success or error json objects.
      */
     function userOTPResult($session_id,$otp)
@@ -338,6 +384,32 @@ class Tozny_Remote_User_API
         );
     }
 
+    /**
+     * Exchange a signed OTP challenge (from user.link_result or user.otp_result) for either an
+     * enrollment challenge (if the original context was "enroll") or a signed user payload (if
+     * the original context was "authenticate").
+     *
+     * @param string $signed_data  Signed data payload
+     * @param string $signature    Realm-signed signature of the payload
+     * @param string [$session_id] If this was an authentication challenge, provide the session ID to close the session
+     *
+     * @return array
+     */
+    function userChallengeExchange( $signed_data, $signature, $session_id = null )
+    {
+        $params = array(
+            'method'       => 'user.challenge_exchange',
+            'realm_key_id' => $this->_realm_key_id,
+            'signed_data'  => $signed_data,
+            'signature'    => $signature,
+        );
+
+        if ( ! empty( $session_id ) ) {
+            $params['session_id'] = $session_id;
+        }
+
+        return $this->rawCall( $params );
+    }
 
     /**
      * Check whether this session is expired, failed, or succeeded.

@@ -994,24 +994,62 @@ class Tozny_Remote_Realm_API
 
 
     /**
+     * Send a `realm.link_challenge` call signed by the current realm.
+     *
+     * @param string $destination Email address to which we will send a challenge.
+     * @param string $endpoint    URL endpoint to be used as a base for the challenge link
+     * @param int    [$lifespan]  Number of seconds for which the link will be valid
+     * @param string [$context]   One of "verify," "authenticate," or "enroll"
+     * @param bool   [$send]      Optional flag whether or not to send the email. If false, will return the OTP URL instead of sending an email.
+     * @param string [$data]      JSON-encoded string of data to be signed along with the request
+     *
+     * @return array
+     */
+    function realmLinkChallenge( $destination, $endpoint, $lifespan, $context = null, $send = true, $data = null )
+    {
+        $params = array(
+            'method'       => 'realm.link_challenge',
+            'realm_key_id' => $this->_realm['realm_key_id'],
+            'destination'  => $destination,
+            'endpoint'     => $endpoint,
+            'send'         => $send ? 'yes' : 'no',
+        );
+
+        if ( ! empty( $lifespan ) ) {
+            $params['lifespan'] = $lifespan;
+        }
+        if ( ! empty( $context ) ) {
+            $params['context'] = $context;
+        }
+        if ( ! empty( $data ) ) {
+            $params['data'] = $data;
+        }
+
+        return $this->rawCall( $params );
+    }
+
+    /**
      * Perform a realm OTP request
      *
-     * @param string $presence - presence token
-     * @param string $destination - email or phone number
-     * @param string $type - email, sms-otp-6, sms-otp-8
-     * @param string $data - data to be signed along with the request
+     * @param string [$presence]    Presence token
+     * @param string [$type]        One of "email," "sms-otp-6," or "sms-otp-8"
+     * @param string [$destination] Email address or phone number
+     * @param string [$data]        JSON-encoded string of data to be signed along with the request
+     * @param string [$context]     One of "verify," "authenticate," or "enroll"
+     *
      * @return mixed Success or error json objects.
      */
-    function realmOTPChallenge($presence,$type=null,$destination=null, $data=null)
+    function realmOTPChallenge( $presence, $type = null, $destination = null, $data = null, $context = null )
     {
         return $this->rawCall(
             array(
-                'method' => 'realm.otp_challenge',
+                'method'       => 'realm.otp_challenge',
                 'realm_key_id' => $this->_realm['realm_key_id'],
-                'data' => $data,
-                'type' => $type,
-                'destination' => $destination,
-                'presence' => $presence,
+                'data'         => $data,
+                'type'         => $type,
+                'destination'  => $destination,
+                'presence'     => $presence,
+                'context'      => $context,
             )
         );
     }

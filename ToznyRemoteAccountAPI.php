@@ -53,10 +53,17 @@ class Tozny_Remote_Account_API
     function __construct($user_id, $account_priv, $account_realm, $in_api_url = NULL)
     {
         $this->setAccount($user_id, $account_priv, $account_realm);
+        
+        $apiTmp = getenv("INTERNAL_API_URL");
+        if ($apiTmp != false) {
+            $this->_api_url = $apiTmp;
+        }
 
-        if ($in_api_url) {
+        elseif ($in_api_url) {
             $this->_api_url = $in_api_url;
-        } else {
+        } 
+        
+        else {
             $apiTmp = getenv("API_URL");
             if ($apiTmp != false) {
                 $this->_api_url = $apiTmp;

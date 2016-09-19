@@ -55,9 +55,16 @@ class Tozny_Remote_Realm_API
     {
         $this->setRealm($realm_key_id, $realm_secret);
 
-        if ($in_api_url) {
+        $apiTmp = getenv("INTERNAL_API_URL");
+        if ($apiTmp != false) {
+            $this->_api_url = $apiTmp;
+        }
+        
+        elseif ($in_api_url) {
             $this->_api_url = $in_api_url;
-        } else {
+        } 
+        
+        else {
             $apiTmp = getenv("API_URL");
             if ($apiTmp != false) {
                 $this->_api_url = $apiTmp;

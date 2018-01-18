@@ -130,6 +130,25 @@ class Tozny_Remote_Realm_API
         }
     }
 
+    /**
+     * Create a challenge session for a given user. Will also test the user's
+     * stored phone number to determine a "risk score" that a relying party
+     * can leverage when determining whether or not to proceed with further
+     * authentication.
+     *
+     * @param string $user_id ID of the user to challenge
+     *
+     * @return array
+     */
+    function createChallenge($user_id)
+    {
+        $args = array(
+            'method'  => 'realm.create_challenge',
+            'user_id' => $user_id
+        );
+
+        return $this->rawCall($args);
+    }
 
     /**
      * An alias for questionChallengeText.

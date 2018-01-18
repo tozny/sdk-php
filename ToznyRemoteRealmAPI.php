@@ -151,6 +151,24 @@ class Tozny_Remote_Realm_API
     }
 
     /**
+     * Invoke a dynamic authentication challenge against a known authentication
+     * session.
+     *
+     * @param string $session_id ID of the challenge session to authenticate
+     *
+     * @return array
+     */
+    function dynamicAuthChallenge($session_id)
+    {
+        $args = array(
+            'method' => 'realm.dynamic_auth_challenge',
+            'session_id' => $session_id
+        );
+
+        return $this->rawCall($args);
+    }
+
+    /**
      * An alias for questionChallengeText.
      *
      * @param string|array $question
